@@ -7,10 +7,12 @@
 //
 
 import UIKit
+import SDWebImage
 
 class AppsSearchController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
 
     fileprivate let cellId = "searchCell"
+    fileprivate var appResults = [Result]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,40 +37,30 @@ class AppsSearchController: UICollectionViewController, UICollectionViewDelegate
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
+        return appResults.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! SearchResultCell
-        cell.nameLabel.text = "My APP"
+        
+        cell.appResult = appResults[indexPath.item]
+        
         return cell
     }
     
     fileprivate func fetchiTunesApps() {
-        let urlString = "https://itunes.apple.com/search?term=instagram&entity=software"
-        guard let url = URL(string: urlString) else { return }
-        
-        // Fetch data from the internet
-        URLSession.shared.dataTask(with: url) { (data, respons, error) in
+        Service.shared.fetchApps { (results, error) in
+            
             if let error = error {
                 print("Failed to fetch apps: ", error)
                 return
             }
             
-            // Success
-//            print(data)
-//            print(String(data: data!, encoding: .utf8))
-            
-            guard let data = data else { return }
-            
-            do {
-                let searchResult = try JSONDecoder().decode(SearchResult.self, from: data)
-                
-                searchResult.results.forEach({print($0.trackName, $0.primaryGenreName)})
-            } catch {
-                print("Failed to decode json: ", error)
+            self.appResults = results
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
             }
-            
-        }.resume() //Fires off the request
+        }
     }
+    
 }
