@@ -12,32 +12,53 @@ class Service {
     
     static let shared = Service() // singleton
     
-    func fetchApps(searchTerm: String, completion: @escaping ([Result], Error?) -> ()) {
+    func fetchApps(searchTerm: String, completion: @escaping (SearchResult?, Error?) -> ()) {
         print("Fetching iTunes apps from service layer")
         
         let urlString = "https://itunes.apple.com/search?term=\(searchTerm)&entity=software"
+        fetchGenericJSONData(urlString: urlString, completion: completion)
+    }
+    
+    func fetchTopGrossing(completion: @escaping (AppGroup?, Error?) -> ()) {
+        let urlString = "https://rss.itunes.apple.com/api/v1/us/ios-apps/top-grossing/all/50/explicit.json"
+        fetchAppGroup(urlString: urlString, completion: completion)
+    }
+    
+    func fetchGames(completion: @escaping (AppGroup?, Error?) -> ()) {
+        fetchAppGroup(urlString: "https://rss.itunes.apple.com/api/v1/us/ios-apps/new-games-we-love/all/50/explicit.json", completion: completion)
+    }
+    
+    // Helper
+    func fetchAppGroup(urlString: String, completion: @escaping (AppGroup?, Error?) -> ()) {
+        fetchGenericJSONData(urlString: urlString, completion: completion)
+    }
+    
+    func fetchHeaderApps(completion: @escaping ([HeaderApp]?, Error?) -> ()) {
+        let urlString = "https://api.letsbuildthatapp.com/appstore/social"
+        fetchGenericJSONData(urlString: urlString, completion: completion)
+    }
+    
+    // Generic JSON
+    func fetchGenericJSONData<T: Decodable>(urlString: String, completion: @escaping (T?, Error?) -> ()) {
         guard let url = URL(string: urlString) else { return }
-
-        // Fetch data from the internet
+        
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             if let error = error {
-                print("Failed to fetch apps: ", error)
-                completion([], nil)
+                completion(nil,error)
                 return
             }
-
-            // Success
+            
             guard let data = data else { return }
-
+            
             do {
-                let searchResult = try JSONDecoder().decode(SearchResult.self, from: data)
-
-                completion(searchResult.results, nil)
+                let objects = try JSONDecoder().decode(T.self, from: data)
+                // Success
+                completion(objects, nil)
             } catch {
-                print("Failed to decode json: ", error)
-                completion([], error)
+                completion(nil, error)
+                print("Failed to decode: ", error)
             }
-
-        }.resume() //Fires off the request
+            
+        }.resume()
     }
 }

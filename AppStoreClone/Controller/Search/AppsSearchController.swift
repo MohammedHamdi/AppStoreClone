@@ -68,7 +68,7 @@ class AppsSearchController: BaseListController, UICollectionViewDelegateFlowLayo
         timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { (_) in
             // This will fire the search
             Service.shared.fetchApps(searchTerm: searchText) { (results, error) in
-                self.appResults = results
+                self.appResults = results?.results ?? []
                 DispatchQueue.main.async {
                     self.collectionView.reloadData()
                 }
@@ -84,7 +84,7 @@ class AppsSearchController: BaseListController, UICollectionViewDelegateFlowLayo
                 return
             }
             
-            self.appResults = results
+            self.appResults = results?.results ?? []
             DispatchQueue.main.async {
                 self.collectionView.reloadData()
             }
