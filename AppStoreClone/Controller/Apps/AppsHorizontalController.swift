@@ -14,6 +14,8 @@ class AppsHorizontalController: HorizontalSnappingController, UICollectionViewDe
     
     var appGroup: AppGroup?
     
+    var didSelectHandler: ((FeedResult) -> ())?
+    
     let topBottomPadding: CGFloat = 12
     let lineSpacing: CGFloat = 10
     
@@ -37,6 +39,12 @@ class AppsHorizontalController: HorizontalSnappingController, UICollectionViewDe
         cell.imageView.sd_setImage(with: URL(string: app?.artworkUrl100 ?? ""))
         
         return cell
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if let app = appGroup?.feed.results[indexPath.item] {
+            didSelectHandler?(app)
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
