@@ -38,6 +38,7 @@ class AppFullScreenController: UITableViewController {
             headerCell.todayCell.todayItem = todayItem
             headerCell.todayCell.layer.cornerRadius = 0
             headerCell.clipsToBounds = true
+            headerCell.todayCell.backgroundView = nil
             return headerCell
         }
         
@@ -56,6 +57,13 @@ class AppFullScreenController: UITableViewController {
     @objc fileprivate func handleDismiss(button: UIButton) {
         button.isHidden = true
         dismissHandler?()
+    }
+    
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView.contentOffset.y < 0 {
+            scrollView.isScrollEnabled = false
+            scrollView.isScrollEnabled = true
+        }
     }
     
 //    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TodayController: BaseListController, UICollectionViewDelegateFlowLayout {
+class TodayController: BaseListController, UICollectionViewDelegateFlowLayout, UIGestureRecognizerDelegate {
     
 //    fileprivate let cellId = "cellId"
 //    fileprivate let multipleAppCellId = "multipleAppCellId"
@@ -38,6 +38,8 @@ class TodayController: BaseListController, UICollectionViewDelegateFlowLayout {
     
     var anchoredConstraints: AnchoredConstraints?
     
+    let blurVisualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
+    
     // To solve a bug that the tab bar doesn't stick to the bottom of the screen (pre iOS 13)
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
@@ -59,6 +61,10 @@ class TodayController: BaseListController, UICollectionViewDelegateFlowLayout {
         
         view.addSubview(activityIndicatorView)
         activityIndicatorView.centerInSuperview()
+        
+        view.addSubview(blurVisualEffectView)
+        blurVisualEffectView.fillSuperview()
+        blurVisualEffectView.alpha = 0
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -97,11 +103,83 @@ class TodayController: BaseListController, UICollectionViewDelegateFlowLayout {
         let appFullScreenController = AppFullScreenController()
         appFullScreenController.todayItem = items[indexPath.item]
         appFullScreenController.dismissHandler = {
-            self.handleRemoveFullScreenView()
+            self.handleAppFullScreenDismissal()
         }
         appFullScreenController.view.layer.cornerRadius = 16
         
+        // #1 setup pan gesture
+        let gesture = UIPanGestureRecognizer(target: self, action: #selector(handleDrag))
+        gesture.delegate = self
+        appFullScreenController.view.addGestureRecognizer(gesture)
+        // #2 add blur effect view
+        
         self.appFullScreenController = appFullScreenController
+    }
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
+    
+    var appFullScreenBeginOffset: CGFloat = 0
+    
+    @objc fileprivate func handleDrag(gesture: UIPanGestureRecognizer) {
+        if gesture.state == .began {
+            appFullScreenBeginOffset = appFullScreenController.tableView.contentOffset.y
+//            print(appFullScreenBeginOffset)
+        }
+        
+        if appFullScreenController.tableView.contentOffset.y > 0 {
+            return
+        }
+        
+        let translationY = gesture.translation(in: appFullScreenController.view).y
+        //        print(translationY)
+        
+        if gesture.state == .changed {
+            if translationY > 0 {
+                let trueOffset = translationY - appFullScreenBeginOffset
+                
+                var scale = 1 - trueOffset / 1000
+                print(trueOffset, scale)
+                
+                scale = min(1, scale)
+                scale = max(0.5, scale)
+                
+                let transform: CGAffineTransform = .init(scaleX: scale, y: scale)
+                self.appFullScreenController.view.transform = transform
+            }
+        } else if gesture.state == .ended {
+            if translationY > 0 {
+                handleAppFullScreenDismissal()
+            }
+        }
+        
+        // My solution
+        /*if gesture.state == .began {
+            appFullScreenBeginOffset = appFullScreenController.tableView.contentOffset.y
+        }
+        if appFullScreenController.tableView.contentOffset.y <= 0 {
+            let translationY = gesture.translation(in: appFullScreenController.view).y
+            
+            if translationY >= 0 {
+                if gesture.state == .changed {
+                    let trueOffset = translationY - appFullScreenBeginOffset
+                    
+                    var scale = 1 - trueOffset / 1000
+                    scale = min(1, scale)
+                    scale = max(0.5, scale)
+                    
+                    let transform: CGAffineTransform = .init(scaleX: scale, y: scale)
+                    self.appFullScreenController.view.transform = transform
+                    
+                    self.appFullScreenController.tableView.isScrollEnabled = false
+                } else if gesture.state == .ended {
+                    handleAppFullScreenDismissal()
+                }
+            } else {
+                self.appFullScreenController.tableView.isScrollEnabled = true
+            }
+        }*/
     }
     
     fileprivate func setupStartingCellFrame(_ indexPath: IndexPath) {
@@ -132,6 +210,8 @@ class TodayController: BaseListController, UICollectionViewDelegateFlowLayout {
     fileprivate func beginAppFullScreenAnimation() {
         UIView.animate(withDuration: 0.7, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.7, options: .curveEaseOut, animations: {
 
+            self.blurVisualEffectView.alpha = 1
+            
             self.anchoredConstraints?.top?.constant = 0
             self.anchoredConstraints?.leading?.constant = 0
             self.anchoredConstraints?.width?.constant = self.view.frame.width
@@ -170,8 +250,11 @@ class TodayController: BaseListController, UICollectionViewDelegateFlowLayout {
         return .init(top: 32, left: 0, bottom: 32, right: 0)
     }
     
-    @objc func handleRemoveFullScreenView() {
+    @objc func handleAppFullScreenDismissal() {
         UIView.animate(withDuration: 0.7, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.7, options: .curveEaseOut, animations: {
+            
+            self.blurVisualEffectView.alpha = 0
+            self.appFullScreenController.view.transform = .identity
             
             guard let startingFrame = self.startingFrame else { return }
             
@@ -189,6 +272,7 @@ class TodayController: BaseListController, UICollectionViewDelegateFlowLayout {
             }
             
             guard let cell = self.appFullScreenController.tableView.cellForRow(at: [0,0]) as? AppFullScreenHeaderCell else { return }
+            cell.closeButton.alpha = 0
             cell.todayCell.topConstraint.constant = 24
             cell.layoutIfNeeded()
         }, completion: { _ in
