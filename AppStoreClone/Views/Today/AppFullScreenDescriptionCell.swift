@@ -25,6 +25,22 @@ class AppFullScreenDescriptionCell: UITableViewCell {
         
         attributedText.append(NSAttributedString(string: "\nTest your abilities by going through many different challenges today.", attributes: [.foregroundColor: UIColor.gray]))
         
+        attributedText.append(NSAttributedString(string: "\n\n\nHeroic adventure", attributes: [.foregroundColor: UIColor.black]))
+        
+        attributedText.append(NSAttributedString(string: "\nBattle in dungeons. Collect treasure. Solve puzzles. Sail to new lands. Oceanhorn lets you do it all in a beautifully detailed world.", attributes: [.foregroundColor: UIColor.gray]))
+        
+        attributedText.append(NSAttributedString(string: "\n\n\nExcellence", attributes: [.foregroundColor: UIColor.black]))
+        
+        attributedText.append(NSAttributedString(string: "\nTest your abilities by going through many different challenges today.", attributes: [.foregroundColor: UIColor.gray]))
+        
+        attributedText.append(NSAttributedString(string: "\n\n\nHeroic adventure", attributes: [.foregroundColor: UIColor.black]))
+        
+        attributedText.append(NSAttributedString(string: "\nBattle in dungeons. Collect treasure. Solve puzzles. Sail to new lands. Oceanhorn lets you do it all in a beautifully detailed world.", attributes: [.foregroundColor: UIColor.gray]))
+        
+        attributedText.append(NSAttributedString(string: "\n\n\nExcellence", attributes: [.foregroundColor: UIColor.black]))
+        
+        attributedText.append(NSAttributedString(string: "\nTest your abilities by going through many different challenges today.", attributes: [.foregroundColor: UIColor.gray]))
+        
         label.font = UIFont.systemFont(ofSize: 20, weight: .regular)
         label.attributedText = attributedText
         label.numberOfLines = 0
