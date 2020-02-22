@@ -16,11 +16,16 @@ class AppFullScreenController: UIViewController, UITableViewDelegate, UITableVie
     
     let tableView = UITableView(frame: .zero, style: .plain)
     
+    let floatingContainerView = UIView()
+    
     let closeButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "close_button"), for: .normal)
         return button
     }()
+    
+    //        let statusBarHeight = view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 44
+    let statusBarHeight = UIApplication.shared.statusBarFrame.height
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,9 +44,7 @@ class AppFullScreenController: UIViewController, UITableViewDelegate, UITableVie
         tableView.allowsSelection = false
         tableView.contentInsetAdjustmentBehavior = .never
         
-//        let height = view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 44
-        let height = UIApplication.shared.statusBarFrame.height
-        tableView.contentInset = .init(top: 0, left: 0, bottom: height, right: 0)
+        tableView.contentInset = .init(top: 0, left: 0, bottom: statusBarHeight, right: 0)
         
         setupFloatingControls()
     }
@@ -82,6 +85,13 @@ class AppFullScreenController: UIViewController, UITableViewDelegate, UITableVie
             scrollView.isScrollEnabled = false
             scrollView.isScrollEnabled = true
         }
+        
+        let translationY = -90 - self.statusBarHeight
+        let transform = scrollView.contentOffset.y > 100 ? CGAffineTransform(translationX: 0, y: translationY) : .identity
+        
+        UIView.animate(withDuration: 0.7, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.7, options: .curveEaseOut, animations: {
+            self.floatingContainerView.transform = transform
+        })
     }
     
     fileprivate func setupCloseButton() {
@@ -92,18 +102,20 @@ class AppFullScreenController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     fileprivate func setupFloatingControls() {
-        let floatingContainerView = UIView()
+        
         floatingContainerView.layer.cornerRadius = 16
         floatingContainerView.clipsToBounds = true
         view.addSubview(floatingContainerView)
         
 //        let bottomPadding = view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
-        let bottomPadding = UIApplication.shared.statusBarFrame.height
-        floatingContainerView.anchor(top: nil, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 16, bottom: bottomPadding, right: 16), size: .init(width: 0, height: 90))
+//        let bottomPadding = UIApplication.shared.statusBarFrame.height
+        floatingContainerView.anchor(top: nil, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 16, bottom: -90, right: 16), size: .init(width: 0, height: 90))
         
         let blurVisualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
         floatingContainerView.addSubview(blurVisualEffectView)
         blurVisualEffectView.fillSuperview()
+        
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap)))
         
         // SubViews
         let imageView = UIImageView(cornerRadius: 16)
@@ -131,6 +143,12 @@ class AppFullScreenController: UIViewController, UITableViewDelegate, UITableVie
         floatingContainerView.addSubview(stackView)
         stackView.fillSuperview(padding: .init(top: 0, left: 16, bottom: 0, right: 16))
         stackView.alignment = .center
+    }
+
+    @objc fileprivate func handleTap() {
+        UIView.animate(withDuration: 0.7, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.7, options: .curveEaseOut, animations: {
+            self.floatingContainerView.transform = .init(translationX: 0, y: -90)
+        })
     }
     
 //    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
