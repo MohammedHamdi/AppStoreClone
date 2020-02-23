@@ -20,7 +20,6 @@ class TodayMultipleAppsController: BaseListController, UICollectionViewDelegateF
         case small, fullscreen
     }
     
-    // [TODO] Doesn't work in iOS 13
     override var prefersStatusBarHidden: Bool { return true }
     
     let closeButton: UIButton = {
@@ -73,7 +72,6 @@ class TodayMultipleAppsController: BaseListController, UICollectionViewDelegateF
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let appId = self.apps[indexPath.item].id
         let appDetailController = AppDetailController(appId: appId)
-        //appDetailController.modalPresentationStyle = .fullScreen
         navigationController?.pushViewController(appDetailController, animated: true)
     }
     

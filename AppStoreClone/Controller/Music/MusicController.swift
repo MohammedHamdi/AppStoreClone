@@ -15,7 +15,7 @@ class MusicController: BaseListController, UICollectionViewDelegateFlowLayout {
     
     var results = [Result]()
     
-    fileprivate let searchTerm = "jnfdkjndfkjndlnf"
+    fileprivate let searchTerm = "eminem"
     fileprivate var isPaginating = false
     fileprivate var isDonePaginating = false
     

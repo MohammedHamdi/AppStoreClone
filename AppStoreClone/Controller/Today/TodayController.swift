@@ -10,18 +10,7 @@ import UIKit
 
 class TodayController: BaseListController, UICollectionViewDelegateFlowLayout, UIGestureRecognizerDelegate {
     
-//    fileprivate let cellId = "cellId"
-//    fileprivate let multipleAppCellId = "multipleAppCellId"
-    
     static let cellSize: CGFloat = 500
-    
-//    let items = [
-
-//
-//        TodayItem.init(category: "HOLIDAYS", title: "Travel on a Budget", image: #imageLiteral(resourceName: "holiday"), description: "Find out all you need to know on how to travel without packing everything!", backgroundColor: UIColor(red: 250 / 255, green: 245 / 255, blue: 175 / 255, alpha: 1), cellType: .single),
-//
-//        TodayItem.init(category: "MULTIPLE CELL", title: "Test-Drive These CarPlay Apps", image: #imageLiteral(resourceName: "star"), description: "", backgroundColor: .white, cellType: .multiple)
-//    ]
     
     var items = [TodayItem]()
     
@@ -107,11 +96,9 @@ class TodayController: BaseListController, UICollectionViewDelegateFlowLayout, U
         }
         appFullScreenController.view.layer.cornerRadius = 16
         
-        // #1 setup pan gesture
         let gesture = UIPanGestureRecognizer(target: self, action: #selector(handleDrag))
         gesture.delegate = self
         appFullScreenController.view.addGestureRecognizer(gesture)
-        // #2 add blur effect view
         
         self.appFullScreenController = appFullScreenController
     }
@@ -125,7 +112,6 @@ class TodayController: BaseListController, UICollectionViewDelegateFlowLayout, U
     @objc fileprivate func handleDrag(gesture: UIPanGestureRecognizer) {
         if gesture.state == .began {
             appFullScreenBeginOffset = appFullScreenController.tableView.contentOffset.y
-//            print(appFullScreenBeginOffset)
         }
         
         if appFullScreenController.tableView.contentOffset.y > 0 {
@@ -133,14 +119,12 @@ class TodayController: BaseListController, UICollectionViewDelegateFlowLayout, U
         }
         
         let translationY = gesture.translation(in: appFullScreenController.view).y
-        //        print(translationY)
         
         if gesture.state == .changed {
             if translationY > 0 {
                 let trueOffset = translationY - appFullScreenBeginOffset
                 
                 var scale = 1 - trueOffset / 1000
-                print(trueOffset, scale)
                 
                 scale = min(1, scale)
                 scale = max(0.5, scale)
@@ -153,33 +137,6 @@ class TodayController: BaseListController, UICollectionViewDelegateFlowLayout, U
                 handleAppFullScreenDismissal()
             }
         }
-        
-        // My solution
-        /*if gesture.state == .began {
-            appFullScreenBeginOffset = appFullScreenController.tableView.contentOffset.y
-        }
-        if appFullScreenController.tableView.contentOffset.y <= 0 {
-            let translationY = gesture.translation(in: appFullScreenController.view).y
-            
-            if translationY >= 0 {
-                if gesture.state == .changed {
-                    let trueOffset = translationY - appFullScreenBeginOffset
-                    
-                    var scale = 1 - trueOffset / 1000
-                    scale = min(1, scale)
-                    scale = max(0.5, scale)
-                    
-                    let transform: CGAffineTransform = .init(scaleX: scale, y: scale)
-                    self.appFullScreenController.view.transform = transform
-                    
-                    self.appFullScreenController.tableView.isScrollEnabled = false
-                } else if gesture.state == .ended {
-                    handleAppFullScreenDismissal()
-                }
-            } else {
-                self.appFullScreenController.tableView.isScrollEnabled = true
-            }
-        }*/
     }
     
     fileprivate func setupStartingCellFrame(_ indexPath: IndexPath) {
@@ -272,7 +229,6 @@ class TodayController: BaseListController, UICollectionViewDelegateFlowLayout, U
             }
             
             guard let cell = self.appFullScreenController.tableView.cellForRow(at: [0,0]) as? AppFullScreenHeaderCell else { return }
-//            cell.closeButton.alpha = 0
             self.appFullScreenController.closeButton.alpha = 0
             cell.todayCell.topConstraint.constant = 24
             cell.layoutIfNeeded()

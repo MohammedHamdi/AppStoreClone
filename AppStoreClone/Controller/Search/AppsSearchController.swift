@@ -35,11 +35,9 @@ class AppsSearchController: BaseListController, UICollectionViewDelegateFlowLayo
         collectionView.backgroundColor = .white
         
         collectionView.addSubview(enterSearchTermLabel)
-        enterSearchTermLabel.fillSuperview(padding: .init(top: 100, left: 50, bottom: 0, right: 50))
+        enterSearchTermLabel.fillSuperview(padding: .init(top: 100, left: 40, bottom: 0, right: 40))
         
         setupSearchBar()
-        
-        //fetchiTunesApps()
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -67,13 +65,11 @@ class AppsSearchController: BaseListController, UICollectionViewDelegateFlowLayo
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        print(searchText)
-        
         // Throttling the search
         timer?.invalidate()
         
         timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { (_) in
-            // This will fire the search
+            // This will start the search
             Service.shared.fetchApps(searchTerm: searchText) { (results, error) in
                 if let error = error {
                     print("Failed to fetch search apps:", error)

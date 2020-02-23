@@ -25,8 +25,6 @@ class PreviewScreenshotsController: HorizontalSnappingController, UICollectionVi
         override init(frame: CGRect) {
             super.init(frame: frame)
             
-            imageView.backgroundColor = .purple
-            
             addSubview(imageView)
             imageView.fillSuperview()
         }

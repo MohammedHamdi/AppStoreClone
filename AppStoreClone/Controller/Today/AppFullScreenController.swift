@@ -24,7 +24,7 @@ class AppFullScreenController: UIViewController, UITableViewDelegate, UITableVie
         return button
     }()
     
-    //        let statusBarHeight = view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 44
+//    let statusBarHeight = view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 44
     let statusBarHeight = UIApplication.shared.statusBarFrame.height
     
     override func viewDidLoad() {
@@ -106,9 +106,7 @@ class AppFullScreenController: UIViewController, UITableViewDelegate, UITableVie
         floatingContainerView.layer.cornerRadius = 16
         floatingContainerView.clipsToBounds = true
         view.addSubview(floatingContainerView)
-        
-//        let bottomPadding = view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
-//        let bottomPadding = UIApplication.shared.statusBarFrame.height
+
         floatingContainerView.anchor(top: nil, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 16, bottom: -90, right: 16), size: .init(width: 0, height: 90))
         
         let blurVisualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
@@ -150,13 +148,4 @@ class AppFullScreenController: UIViewController, UITableViewDelegate, UITableVie
             self.floatingContainerView.transform = .init(translationX: 0, y: -90)
         })
     }
-    
-//    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-//        let header = TodayCell()
-//        return header
-//    }
-//
-//    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-//        return 450
-//    }
 }
