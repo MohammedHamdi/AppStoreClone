@@ -36,4 +36,4 @@ A clone for the app store.
 
 
 #
-This app was developed by following letsbuildthatapp [AppStore JSON APIs](https://www.letsbuildthatapp.com/course/AppStore-JSON-APIs) tutorial.
+This app was developed by the help of letsbuildthatapp [AppStore JSON APIs](https://www.letsbuildthatapp.com/course/AppStore-JSON-APIs) tutorial.
